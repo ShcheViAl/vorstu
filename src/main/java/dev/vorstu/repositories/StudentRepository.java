@@ -1,7 +1,8 @@
 package dev.vorstu.repositories;
 
-import dev.vorstu.dto.Student;
-import org.springframework.data.repository.CrudRepository;
+import dev.vorstu.entity.Student;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface StudentRepository extends CrudRepository<Student, Long> {
+
+public interface StudentRepository extends JpaRepository<Student, Long> {
 }

@@ -1,6 +1,6 @@
 package dev.vorstu;
 
-import dev.vorstu.dto.Student;
+import dev.vorstu.entity.Student;
 import dev.vorstu.repositories.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
