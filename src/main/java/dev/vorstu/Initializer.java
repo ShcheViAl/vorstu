@@ -1,0 +1,19 @@
+package dev.vorstu;
+
+import dev.vorstu.dto.Student;
+import dev.vorstu.repositories.StudentRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+@Component
+public class Initializer {
+    @Autowired
+    private StudentRepository studentRepository;
+
+    public void initial(){
+        studentRepository.save(new Student("fio", "def_group", "+79"));
+        studentRepository.save(new Student("User1", "VM", "+7"));
+        studentRepository.save(new Student("User2", "VM", "+8"));
+        studentRepository.save(new Student("User3", "AM", "+99"));
+    }
+}
