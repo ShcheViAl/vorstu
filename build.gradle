@@ -23,16 +23,17 @@ dependencies {
 
     implementation 'org.springframework.boot:spring-boot-starter-data-rest'
 	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
-
-    // Source: https://mvnrepository.com/artifact/org.liquibase/liquibase-core
-    //implementation 'org.liquibase:liquibase-core:5.0.3'
-
     implementation 'org.springframework.boot:spring-boot-starter-liquibase'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
+
+    testImplementation 'com.h2database:h2'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
+    jvmArgs('-XX:+EnableDynamicAgentLoading')
 }

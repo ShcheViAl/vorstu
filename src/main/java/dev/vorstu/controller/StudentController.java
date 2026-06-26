@@ -9,30 +9,28 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
-@RequestMapping("api/base")
-public class BaseController {
+@RequestMapping("api/students")
+public class StudentController {
     @Autowired
     private StudentService studentService;
 
-    @GetMapping("students")
+    @GetMapping()
     public Page<StudentResponseDto> getAllStudents(Pageable pageable){
         return studentService.getAllStudents(pageable);
     }
 
-    @PostMapping(value = "students", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public StudentResponseDto createStudent(@RequestBody StudentRequestDto newStudent){
         return studentService.createStudent(newStudent);
     }
 
-    @PutMapping(value = "students/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public StudentResponseDto changeStudent(@RequestBody StudentRequestDto changingStudent, @PathVariable Long id) {
         return studentService.changeStudent(changingStudent, id);
     }
 
-    @DeleteMapping(value = "students/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public StudentResponseDto deleteStudent(@PathVariable("id") Long id) {
         return studentService.deleteStudent(id);
     }
