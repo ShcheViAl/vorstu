@@ -1,0 +1,13 @@
+# IDE
+.idea/
+*.iml
+*.iws
+# Gradle
+.gradle/
+build/
+
+*.class
+*.log
+
+# Windows
+Thumbs.db
