@@ -27,7 +27,7 @@ public class BaseController {
         return studentService.createStudent(newStudent);
     }
 
-    @PutMapping(value = "students", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "students/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public StudentResponseDto changeStudent(@RequestBody StudentRequestDto changingStudent, @PathVariable Long id) {
         return studentService.changeStudent(changingStudent, id);
     }
