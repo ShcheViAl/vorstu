@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="2.2" author="vorstu">
+        <addColumn tableName="students">
+            <column name="user_id" type="BIGINT"/>
+            <column name="group_id" type="BIGINT"/>
+        </addColumn>
+
+        <sql>
+            INSERT INTO groups (id, name)
+            SELECT nextval('groups_seq'), DISTINCT group_of_students
+            FROM students
+            WHERE group_of_students IS NOT NULL;
+
+            UPDATE students s
+            SET group_id = g.id
+            FROM groups g
+            WHERE s.group_of_students = g.name;
+        </sql>
+
+        <addForeignKeyConstraint baseTableName="students" baseColumnNames="user_id"
+                                 constraintName="fk_students_users"
+                                 referencedTableName="users" referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint baseTableName="students" baseColumnNames="group_id"
+                                 constraintName="fk_students_groups"
+                                 referencedTableName="groups" referencedColumnNames="id"/>
+
+        <dropColumn tableName="students" columnName="group_of_students"/>
+
+
+        <rollback>
+            <addColumn tableName="students">
+                <column name="group_of_students" type="VARCHAR(255)"/>
+            </addColumn>
+
+            <sql>
+                UPDATE students s
+                SET group_of_students = g.name
+                FROM groups g
+                WHERE s.group_id = g.id;
+            </sql>
+
+            <dropForeignKeyConstraint baseTableName="students" constraintName="fk_students_groups"/>
+            <dropForeignKeyConstraint baseTableName="students" constraintName="fk_students_users"/>
+
+            <dropColumn tableName="students" columnName="group_id"/>
+            <dropColumn tableName="students" columnName="user_id"/>
+        </rollback>
+    </changeSet>
+
+
+
+
+
+</databaseChangeLog>

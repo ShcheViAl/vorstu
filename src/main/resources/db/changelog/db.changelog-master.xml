@@ -5,4 +5,9 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
     <include file="db/changelog/changesets/v1_init_students_table.xml"/>
+    <include file="db/changelog/changesets/v2.0_init_groups_table.xml"/>
+    <include file="db/changelog/changesets/v2.1_init_users_table.xml"/>
+    <include file="db/changelog/changesets/v2.2_update_students_table.xml"/>
+    <include file="db/changelog/changesets/v2.3_init_teachers_table.xml"/>
+
 </databaseChangeLog>

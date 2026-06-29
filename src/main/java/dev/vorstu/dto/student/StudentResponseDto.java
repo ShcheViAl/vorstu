@@ -1,4 +1,4 @@
-package dev.vorstu.dto;
+package dev.vorstu.dto.student;
 
 import lombok.Builder;
 import lombok.Data;
@@ -8,6 +8,6 @@ import lombok.Data;
 public class StudentResponseDto {
     private Long id;
     private String fio;
-    private String group;
+    private Long groupId;
     private String phoneNumber;
 }

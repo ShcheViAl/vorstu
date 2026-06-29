@@ -1,7 +1,7 @@
 package dev.vorstu.mapper;
 
-import dev.vorstu.dto.StudentRequestDto;
-import dev.vorstu.dto.StudentResponseDto;
+import dev.vorstu.dto.student.StudentRequestDto;
+import dev.vorstu.dto.student.StudentResponseDto;
 import dev.vorstu.entity.Student;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
