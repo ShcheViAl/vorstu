@@ -1,7 +1,7 @@
 -- liquibase formatted sql
 
 -- changeset vorstu:2.1
-CREATE SEQUENCE users_seq START WITH 1 INCREMENT BY 50
+CREATE SEQUENCE users_seq START WITH 1 INCREMENT BY 50;
 CREATE TABLE users(
     id BIGINT PRIMARY KEY,
     username VARCHAR(255) NOT NULL UNIQUE,

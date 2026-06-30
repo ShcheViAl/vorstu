@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+
 @Entity
 @Data
 @AllArgsConstructor
@@ -22,4 +23,8 @@ public class Teacher {
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    @ManyToMany
+    @JoinTable(name = "teachers_groups", joinColumns = @JoinColumn(name = "teacher_id"), inverseJoinColumns = @JoinColumn(name = "group_id"))
+    private List<Group> groups;
 }
