@@ -2,100 +2,111 @@ package dev.vorstu.service;
 
 import dev.vorstu.dto.student.StudentRequestDto;
 import dev.vorstu.dto.student.StudentResponseDto;
-import dev.vorstu.entity.Role;
-import dev.vorstu.entity.Student;
-import dev.vorstu.entity.User;
+import dev.vorstu.entity.*;
 import dev.vorstu.exceptions.NotFoundException;
 
 import dev.vorstu.mapper.StudentMapper;
 import dev.vorstu.repositories.StudentRepository;
 import dev.vorstu.repositories.TeacherRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
-import java.nio.file.AccessDeniedException;
+import java.util.Objects;
 
-
+@RequiredArgsConstructor
 @Service
 public class StudentService {
 
-    @Autowired
-    private StudentRepository studentRepository;
-    @Autowired
-    private TeacherRepository teacherRepository;
-    @Autowired
-    private StudentMapper studentMapper;
+    private final StudentRepository studentRepository;
+    private final TeacherRepository teacherRepository;
+    private final StudentMapper studentMapper;
 
-    public Page<StudentResponseDto> getAllStudents(Pageable pageable) throws AccessDeniedException {
-        User user = getUser();
+    public Page<StudentResponseDto> getAllStudents(Pageable pageable, User user) {
         switch (user.getRole()){
             case ADMIN:
                 return studentRepository.findAll(pageable)
-                        .map(student -> studentMapper.toResponseDto(student));
+                        .map(studentMapper::toResponseDto);
 
             case TEACHER:
                 Long teacherId = teacherRepository.findByUserId(user.getId()).orElseThrow(()-> new NotFoundException("User not found")).getId();
-                return studentRepository.findAllByGroupTeacherId(teacherId, pageable).map(student ->  studentMapper.toResponseDto(student));
+                return studentRepository.findAllByGroupTeacherId(teacherId, pageable).map(studentMapper::toResponseDto);
 
             case STUDENT:
-                Student student = studentRepository.findByUserId(user.getId()).orElseThrow(()->new NotFoundException("User noy found"));
-                return studentRepository.findAllByGroupId(student.getGroup().getId(),pageable).map(student1 -> studentMapper.toResponseDto(student1));
+                Student student = studentRepository.findByUserId(user.getId()).orElseThrow(()->new NotFoundException("User not found"));
+                return studentRepository.findAllByGroupId(student.getGroup().getId(),pageable).map(studentMapper::toResponseDto);
 
             default:
                 throw new AccessDeniedException("Role Unknown");
         }
     }
 
-    public StudentResponseDto createStudent(StudentRequestDto newStudentDto) throws AccessDeniedException {
-        User user = getUser();
-        if (!user.getRole().equals(Role.ADMIN)) throw new AccessDeniedException("only admin can create Student");
+    public StudentResponseDto getStudent(Long id, User user) {
+        Student student = studentRepository.findById(id).orElseThrow(()-> new NotFoundException("Student not found"));
+
+        switch (user.getRole()){
+            case ADMIN -> {}
+            case TEACHER -> {
+                if (!groupHasTeacherByUserId(student.getGroup(), user.getId())){
+                    throw new AccessDeniedException("Teacher has access only to students assigned to him");
+                }
+            }
+            case STUDENT -> {
+                if (!user.getId().equals(student.getUser().getId())){
+                    throw new AccessDeniedException("Student has access only to his information");
+                }
+            }
+            default ->
+                throw new AccessDeniedException("Role Unknown");
+        }
+        return studentMapper.toResponseDto(student);
+    }
+    //TODO create User
+    public StudentResponseDto createStudent(StudentRequestDto newStudentDto) {
         Student savedStudent = studentRepository.save(studentMapper.toEntity(newStudentDto));
         return studentMapper.toResponseDto(savedStudent);
     }
 
-    public StudentResponseDto changeStudent(StudentRequestDto changingStudentDto, Long id) throws AccessDeniedException {
+    public StudentResponseDto changeStudent(StudentRequestDto changingStudentDto, Long id, User user) {
         Student changingStudent = studentRepository.findById(id).orElseThrow(()->
                 new NotFoundException("Student with this id does not found"));
 
-        User user = getUser();
         switch (user.getRole()){
-            case STUDENT:
+            case STUDENT -> {
                 if (!user.getId().equals(changingStudent.getUser().getId())){
                     throw new AccessDeniedException("Student not allowed to change another student");
                 }
-                studentMapper.updateEntityFromDto(changingStudentDto, changingStudent);
-                return studentMapper.toResponseDto(studentRepository.save(changingStudent));
-            case TEACHER:
-                if (!user.getId().equals(changingStudent.getGroup().getTeacher().getUser().getId())){
-                    throw new AccessDeniedException("Teacher can change only studends assigned to him");
+            }
+            case TEACHER -> {
+                Group group = changingStudent.getGroup();
+                if (!groupHasTeacherByUserId(group, user.getId())){
+                    throw new AccessDeniedException("Teacher can change only students assigned to him");
                 }
-                studentMapper.updateEntityFromDto(changingStudentDto, changingStudent);
-                return studentMapper.toResponseDto(studentRepository.save(changingStudent));
-            case ADMIN:
-                studentMapper.updateEntityFromDto(changingStudentDto, changingStudent);
-                return studentMapper.toResponseDto(studentRepository.save(changingStudent));
-            default:
+            }
+            case ADMIN -> {}
+            default ->
                 throw new AccessDeniedException("Role Unknown");
         }
+        studentMapper.updateEntityFromDto(changingStudentDto, changingStudent);
+        return studentMapper.toResponseDto(studentRepository.save(changingStudent));
     }
 
-    public StudentResponseDto deleteStudent(Long id) throws AccessDeniedException {
+    public StudentResponseDto deleteStudent(Long id){
         Student deletedStudent = studentRepository.findById(id).orElseThrow(()->
                 new NotFoundException("Student with this id does not found"));
-
-        User user = getUser();
-
-        if (!user.getRole().equals(Role.ADMIN)) throw new AccessDeniedException("only admin can delete Student");
-
         studentRepository.deleteById(id);
         return studentMapper.toResponseDto(deletedStudent);
     }
 
-
-    private User getUser(){
-        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    private boolean groupHasTeacherByUserId(Group group, Long userId){
+        if (group.getTeachers()==null || userId==null){
+            return false;
+        }
+        return group.getTeachers().stream()
+                .map(Teacher::getUser)
+                .filter(Objects::nonNull)
+                .anyMatch(user -> userId.equals(user.getId()));
     }
 }

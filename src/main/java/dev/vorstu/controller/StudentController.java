@@ -2,41 +2,49 @@ package dev.vorstu.controller;
 
 import dev.vorstu.dto.student.StudentRequestDto;
 import dev.vorstu.dto.student.StudentResponseDto;
+import dev.vorstu.entity.User;
 import dev.vorstu.service.StudentService;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/students")
+@RequiredArgsConstructor
 public class StudentController {
-    @Autowired
-    private StudentService studentService;
+    private final StudentService studentService;
 
-    @SneakyThrows
-    @GetMapping()
-    public Page<StudentResponseDto> getAllStudents(Pageable pageable){
-        return studentService.getAllStudents(pageable);
+    @GetMapping("/{id}")
+    public StudentResponseDto getStudent(@PathVariable Long id, @AuthenticationPrincipal User user){
+        return studentService.getStudent(id, user);
     }
 
-    @SneakyThrows
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping
+    public Page<StudentResponseDto> getAllStudents(Pageable pageable, @AuthenticationPrincipal User user){
+        return studentService.getAllStudents(pageable, user);
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PostMapping()
     public StudentResponseDto createStudent(@RequestBody StudentRequestDto newStudent){
         return studentService.createStudent(newStudent);
     }
 
-    @SneakyThrows
-    @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public StudentResponseDto changeStudent(@RequestBody StudentRequestDto changingStudent, @PathVariable Long id) {
-        return studentService.changeStudent(changingStudent, id);
+
+    @PutMapping(value = "/{id}")
+    public StudentResponseDto changeStudent(@RequestBody StudentRequestDto changingStudent, @PathVariable Long id, @AuthenticationPrincipal User user) {
+        return studentService.changeStudent(changingStudent, id, user);
     }
 
-    @SneakyThrows
-    @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public StudentResponseDto deleteStudent(@PathVariable("id") Long id) {
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @DeleteMapping("/{id}")
+    public StudentResponseDto deleteStudent(@PathVariable Long id) {
         return studentService.deleteStudent(id);
     }
 }
