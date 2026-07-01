@@ -9,8 +9,7 @@ import java.util.Optional;
 
 
 public interface StudentRepository extends JpaRepository<Student, Long> {
-    Page<Student> findAllByGroupId(Long groupId, Pageable pageable);
-    Page<Student> findAllByGroupTeacherId(Long teacherId, Pageable pageable);
+    Page<Student> findAllByGroupTeachersId(Long teacherId, Pageable pageable);
     Optional<Student> findByUserId(Long id);
 
 }

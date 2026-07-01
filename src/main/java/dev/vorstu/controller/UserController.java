@@ -3,6 +3,7 @@ package dev.vorstu.controller;
 import dev.vorstu.dto.user.UserRequestDto;
 import dev.vorstu.dto.user.UserResponseDto;
 import dev.vorstu.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,7 +18,7 @@ public class UserController {
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping
-    public UserResponseDto createUser(@RequestBody UserRequestDto dto){
+    public UserResponseDto createUser(@Valid @RequestBody UserRequestDto dto){
         return userService.createUser(dto);
     }
 
@@ -35,7 +36,7 @@ public class UserController {
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("/{id}")
-    public UserResponseDto changeUser(@RequestBody UserRequestDto dto, @PathVariable Long id){
+    public UserResponseDto changeUser(@Valid @RequestBody UserRequestDto dto, @PathVariable Long id){
         return userService.changeUser(dto, id);
     }
 

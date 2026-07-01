@@ -1,9 +1,11 @@
 package dev.vorstu.controller;
 
+import dev.vorstu.dto.teacher.TeacherCreateRequestDto;
 import dev.vorstu.dto.teacher.TeacherRequestDto;
 import dev.vorstu.dto.teacher.TeacherResponseDto;
 import dev.vorstu.entity.User;
 import dev.vorstu.service.TeacherService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,7 +26,7 @@ public class TeacherController {
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping
-    public TeacherResponseDto createTeacher(@RequestBody TeacherRequestDto dto){
+    public TeacherResponseDto createTeacher(@Valid @RequestBody TeacherCreateRequestDto dto){
         return teacherService.createTeacher(dto);
     }
 
@@ -36,7 +38,7 @@ public class TeacherController {
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("/{id}")
-    public TeacherResponseDto changeTeacher(@RequestBody TeacherRequestDto dto, @PathVariable Long id){
+    public TeacherResponseDto changeTeacher(@Valid @RequestBody TeacherRequestDto dto, @PathVariable Long id){
         return teacherService.changeTeacher(dto, id);
     }
 

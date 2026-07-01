@@ -1,7 +1,7 @@
 -- liquibase formatted sql
 
 -- changeset vorstu:2.2
-ALTER TABLE students ADD user_id BIGINT;
+ALTER TABLE students ADD user_id BIGINT UNIQUE;
 ALTER TABLE students ADD group_id BIGINT;
 
 INSERT INTO groups (id, name)

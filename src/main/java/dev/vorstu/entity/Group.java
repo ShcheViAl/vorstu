@@ -1,26 +1,36 @@
 package dev.vorstu.entity;
 
 import jakarta.persistence.*;
-import liquibase.license.LicenseService;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 @Entity
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Table(name = "groups")
 public class Group {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "group_gen")
+    @SequenceGenerator(name = "group_gen", sequenceName = "groups_seq")
     private Long id;
     private String name;
 
     @ManyToMany(mappedBy = "groups")
-    private List<Teacher> teachers;
+    private Set<Teacher> teachers;
+
+    @Override
+    public boolean equals(Object object) {
+        if (object == null || getClass() != object.getClass()) return false;
+        Group group = (Group) object;
+        return Objects.equals(id, group.id);
+    }
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
 }

@@ -11,5 +11,5 @@ import java.util.List;
 public class GroupResponseDto {
     private Long id;
     private String name;
-    private List<Teacher> teachers;
+    private List<Long> teacherIds;
 }

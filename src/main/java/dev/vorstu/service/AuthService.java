@@ -3,7 +3,7 @@ package dev.vorstu.service;
 import dev.vorstu.dto.auth.AuthResponse;
 import dev.vorstu.dto.auth.LoginRequest;
 import dev.vorstu.security.JwtService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,22 +13,18 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 
 @Service
+@RequiredArgsConstructor
 public class AuthService {
-    @Autowired
-    private AuthenticationManager authenticationManager;
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private JwtService jwtService;
-    @Autowired
-    private UserDetailsService userDetailsService;
+    private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
+    private final UserDetailsService userDetailsService;
 
     public AuthResponse login(LoginRequest loginRequest){
         authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
+                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
         );
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequest.getUsername());
+        UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequest.getEmail());
         String token = jwtService.generateToken(new HashMap<>(), userDetails);
         return new AuthResponse(token);
     }

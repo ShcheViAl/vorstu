@@ -1,9 +1,11 @@
 package dev.vorstu.controller;
 
+import dev.vorstu.dto.student.StudentCreateRequestDto;
 import dev.vorstu.dto.student.StudentRequestDto;
 import dev.vorstu.dto.student.StudentResponseDto;
 import dev.vorstu.entity.User;
 import dev.vorstu.service.StudentService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,13 +34,13 @@ public class StudentController {
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping()
-    public StudentResponseDto createStudent(@RequestBody StudentRequestDto newStudent){
+    public StudentResponseDto createStudent(@Valid @RequestBody StudentCreateRequestDto newStudent){
         return studentService.createStudent(newStudent);
     }
 
 
     @PutMapping(value = "/{id}")
-    public StudentResponseDto changeStudent(@RequestBody StudentRequestDto changingStudent, @PathVariable Long id, @AuthenticationPrincipal User user) {
+    public StudentResponseDto changeStudent(@Valid @RequestBody StudentRequestDto changingStudent, @PathVariable Long id, @AuthenticationPrincipal User user) {
         return studentService.changeStudent(changingStudent, id, user);
     }
 

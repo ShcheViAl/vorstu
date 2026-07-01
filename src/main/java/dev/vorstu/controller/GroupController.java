@@ -4,14 +4,13 @@ import dev.vorstu.dto.group.GroupRequestDto;
 import dev.vorstu.dto.group.GroupResponseDto;
 import dev.vorstu.entity.User;
 import dev.vorstu.service.GroupService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.awt.*;
 
 @RestController
 @RequestMapping("api/groups")
@@ -21,7 +20,7 @@ public class GroupController {
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping
-    public GroupResponseDto createGroup(@RequestBody GroupRequestDto dto){
+    public GroupResponseDto createGroup(@Valid @RequestBody GroupRequestDto dto){
         return groupService.createGroup(dto);
     }
 
@@ -38,7 +37,7 @@ public class GroupController {
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("/{id}")
-    public GroupResponseDto changeGroup(@RequestBody GroupRequestDto dto, @PathVariable Long id){
+    public GroupResponseDto changeGroup(@Valid @RequestBody GroupRequestDto dto, @PathVariable Long id){
         return groupService.changeGroup(dto, id);
     }
 

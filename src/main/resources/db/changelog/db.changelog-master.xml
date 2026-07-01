@@ -9,5 +9,6 @@
     <include file="db/changelog/changesets/v2.1_init_users_table.sql"/>
     <include file="db/changelog/changesets/v2.2_update_students_table.sql"/>
     <include file="db/changelog/changesets/v2.3_init_teachers_table.sql"/>
+    <include file="db/changelog/changesets/v3_add_custom_validation.sql"/>
 
 </databaseChangeLog>

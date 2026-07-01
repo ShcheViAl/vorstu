@@ -10,4 +10,5 @@ public class StudentResponseDto {
     private String fio;
     private Long groupId;
     private String phoneNumber;
+    private Long userId;
 }

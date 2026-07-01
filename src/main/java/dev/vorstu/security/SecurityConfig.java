@@ -1,6 +1,5 @@
 package dev.vorstu.security;
 
-import dev.vorstu.exceptions.NotFoundException;
 import dev.vorstu.repositories.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -49,8 +49,8 @@ public class SecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService(){
-        return username -> userRepository.findByUsername(username)
-                .orElseThrow(()-> new NotFoundException("User not found"));
+        return email -> userRepository.findByEmail(email)
+                .orElseThrow(()-> new UsernameNotFoundException("User not found"));
     }
     @Bean
     public PasswordEncoder passwordEncoder(){

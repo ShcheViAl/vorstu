@@ -9,16 +9,21 @@ import dev.vorstu.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
+    @Transactional
     public UserResponseDto createUser(UserRequestDto dto){
         User newUser = userMapper.toEntity(dto);
+        newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
         User savedUser = userRepository.save(newUser);
         return userMapper.toDto(savedUser);
     }
@@ -32,12 +37,18 @@ public class UserService {
         return userRepository.findAll(pageable).map(userMapper::toDto);
     }
 
+    @Transactional
     public UserResponseDto changeUser(UserRequestDto dto, Long id){
         User changingUser = userRepository.findById(id).orElseThrow(()->new NotFoundException("User not found"));
         userMapper.updateEntityFromDto(changingUser, dto);
-        return userMapper.toDto(changingUser);
+        if (dto.getPassword()!=null){
+            changingUser.setPassword(passwordEncoder.encode(dto.getPassword()));
+        }
+        User changedUser = userRepository.save(changingUser);
+        return userMapper.toDto(changedUser);
     }
 
+    @Transactional
     public UserResponseDto deleteUser(Long id){
         User user = userRepository.findById(id).orElseThrow(()->new NotFoundException("User not found"));
         userRepository.delete(user);
